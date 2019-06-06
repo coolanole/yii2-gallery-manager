@@ -25,8 +25,8 @@ class m140930_003227_gallery_manager extends Migration
             'type'        => 'TEXT NOT NULL',
             'ownerId'     => 'UUID NOT NULL',
             'rank'        => 'INT8 NOT NULL DEFAULT 0',
-            'name'        => 'TEXT NOT NULL',
-            'description' => 'TEXT NOT NULL',
+            'name'        => 'TEXT NOT NULL DEFAULT \'\'',
+            'description' => 'TEXT NOT NULL DEFAULT \'\'',
         ]);
 
         $this->addPrimaryKey('pk-gallery_image[id]', $this->tableName, 'id');
