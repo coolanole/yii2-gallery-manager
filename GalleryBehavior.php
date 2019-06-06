@@ -337,10 +337,6 @@ class GalleryBehavior extends Behavior
             'ownerId' => $this->getGalleryId(),
         ])->execute();
 
-        $db->createCommand()->update($this->tableName, [
-            'id' => $id
-        ])->execute();
-
         $this->replaceImage($id, $fileName);
 
         $galleryImage = new GalleryImage($this, ['id' => $id]);
