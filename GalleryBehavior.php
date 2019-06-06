@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace zxbodya\yii2\galleryManager;
 
 use Imagine\Image\Box;
@@ -10,6 +12,9 @@ use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\FileHelper;
 use yii\imagine\Image;
+use thamtech\uuid\helpers\UuidHelper;
+use WebPConvert\WebPConvert;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 /**
  * Behavior for adding gallery to any model.
@@ -187,16 +192,15 @@ class GalleryBehavior extends Behavior
         return $this->_images;
     }
 
-    protected function getFileName($imageId, $version = 'original')
+    protected function getFileName($imageId, $version = 'original', $extension = null)
     {
-        return implode(
-            '/',
-            [
-                $this->getGalleryId(),
-                $imageId,
-                $version . '.' . $this->extension,
-            ]
-        );
+        $extension = $extension ?: $this->extension;
+
+        return implode('/', [
+            $this->getGalleryId(),
+            $imageId,
+            $version . '.' . $extension,
+        ]);
     }
 
     public function getUrl($imageId, $version = 'original')
@@ -218,9 +222,9 @@ class GalleryBehavior extends Behavior
         return $this->url . '/' . $this->getFileName($imageId, $version) . $suffix;
     }
 
-    public function getFilePath($imageId, $version = 'original')
+    public function getFilePath($imageId, $version = 'original', $extension = null)
     {
-        return $this->directory . '/' . $this->getFileName($imageId, $version);
+        return $this->directory . '/' . $this->getFileName($imageId, $version, $extension);
     }
 
     /**
@@ -247,8 +251,16 @@ class GalleryBehavior extends Behavior
                 $options = [];
             }
 
-            $image
-                ->save($this->getFilePath($imageId, $version), $options);
+            $image->save($this->getFilePath($imageId, $version), $options);
+
+            // Image optimization
+            $optimizerChain = OptimizerChainFactory::create();
+            $optimizerChain->optimize($this->getFilePath($imageId, $version));
+
+            // Creating a WebP version
+            $source = $this->getFilePath($imageId, $version);
+            $destination = $this->getFilePath($imageId, $version, 'webp');
+            WebPConvert::convert($source, $destination, []);
         }
     }
 
@@ -318,23 +330,18 @@ class GalleryBehavior extends Behavior
 
     public function addImage($fileName)
     {
-        $db = \Yii::$app->db;
-        $db->createCommand()
-            ->insert(
-                $this->tableName,
-                [
-                    'type' => $this->type,
-                    'ownerId' => $this->getGalleryId()
-                ]
-            )->execute();
+        $id = UuidHelper::uuid();
 
-        $id = $db->getLastInsertID('gallery_image_id_seq');
-        $db->createCommand()
-            ->update(
-                $this->tableName,
-                ['rank' => $id],
-                ['id' => $id]
-            )->execute();
+        $db = \Yii::$app->db;
+        $db->createCommand()->insert($this->tableName, [
+            'id'      => $id,
+            'type'    => $this->type,
+            'ownerId' => $this->getGalleryId(),
+        ])->execute();
+
+        $db->createCommand()->update($this->tableName, [
+            'id' => $id
+        ])->execute();
 
         $this->replaceImage($id, $fileName);
 

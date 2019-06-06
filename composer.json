@@ -17,7 +17,10 @@
     ],
     "require": {
         "yiisoft/yii2-jui": "*",
-        "yiisoft/yii2-imagine": "*"
+        "yiisoft/yii2-imagine": "*",
+        "thamtech/yii2-uuid": "*",
+        "rosell-dk/webp-convert": "*",
+        "spatie/image-optimizer": "*"
     },
     "autoload": {
         "psr-4": {
@@ -25,4 +28,3 @@
         }
     }
 }
-
