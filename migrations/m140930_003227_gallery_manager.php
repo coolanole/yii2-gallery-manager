@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace zxbodya\yii2\galleryManager\migrations;
+namespace coolanole\yii2\galleryManager\migrations;
 
 use yii\db\Migration;
 

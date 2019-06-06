@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace zxbodya\yii2\galleryManager;
+namespace coolanole\yii2\galleryManager;
 
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
