@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace coolanole\yii2\galleryManager;
 
 use Imagine\Image\Box;
